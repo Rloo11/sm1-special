@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple porf</title>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+const audio = document.getElementById("myAudio");
+const progressBar = document.getElementById("progressBar");
+const playButton = document.getElementById("playButton");
+const playIcon = document.getElementById("play-icon");
+const progressContainer = document.getElementById("progressContainer");
+const currentTimeDisplay = document.getElementById("currentTime");
+const durationDisplay = document.getElementById("duration");
+
+/* ===== GANTI URL MUSIC DI SINI ===== */
+audio.src = "https://litter.catbox.moe/1ih9rjjzqoh40da7.mp3";
+/* =================================== */
+
+function toggleMusic() {
+    if (!audio) return;
+    if (audio.paused) {
+        audio.play();
+        playIcon.classList.replace('bx-play', 'bx-pause');
+    } else {
+        audio.pause();
+        playIcon.classList.replace('bx-pause', 'bx-play');
+    }
+}
+
+playButton.addEventListener('click', toggleMusic);
+progressContainer.addEventListener('click', setProgress);
+
+audio.addEventListener('timeupdate', updateProgress);
+audio.addEventListener('loadedmetadata', () => {
+    durationDisplay.textContent = formatTime(audio.duration);
+});
+
+function updateProgress() {
+    const progress = (audio.currentTime / audio.duration) * 100;
+    progressBar.style.width = `${progress}%`;
+    currentTimeDisplay.textContent = formatTime(audio.currentTime);
+}
+
+function setProgress(e) {
+    const width = progressContainer.clientWidth;
+    const clickX = e.offsetX;
+    audio.currentTime = (clickX / width) * audio.duration;
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+window.toggleMusic = toggleMusic;
+
+});
+</script>
+
+<style>
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#ff9ecf,#ff6fa5,#f06292);
+    color:white;
+    overflow:hidden;
+    position: relative;
+}
+
+/* Wave/biru dipertahankan */
+.wave {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.wave svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.slide{
+    width:100%;
+    height:100vh;
+    display:none;
+    flex-direction:column;
+    text-align:center;
+    padding:0 20px;
+    align-items:center;
+    justify-content:center;
+    transform: translateY(40px);
+    opacity:0;
+    transition: all 0.6s ease;
+    position: relative;
+    z-index: 10;
+}
+
+.active{
+    display:flex;
+    opacity:1;
+    transform: translateY(0);
+}
+
+/* Animasi khusus untuk setiap slide */
+#slide1.active {
+    animation: floatIn 0.8s ease-out;
+}
+#slide2.active {
+    animation: fadeScale 0.7s ease-out;
+}
+#slide3.active {
+    animation: spinIn 0.8s ease-out;
+}
+#slide4.active {
+    animation: memoryZoom 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#slide5.active {
+    animation: slideUpBounce 0.8s ease-out;
+}
+#slide6.active {
+    animation: heartPulse 0.8s ease-out;
+}
+
+/* Animasi definisi */
+@keyframes floatIn {
+    0% { opacity: 0; transform: translateY(60px) rotate(-2deg); }
+    100% { opacity: 1; transform: translateY(0) rotate(0); }
+}
+@keyframes fadeScale {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+@keyframes spinIn {
+    0% { opacity: 0; transform: rotate(-15deg) scale(0.9); }
+    100% { opacity: 1; transform: rotate(0) scale(1); }
+}
+@keyframes memoryZoom {
+    0% { opacity: 0; transform: perspective(400px) rotateX(10deg) translateY(50px); filter: blur(4px); }
+    100% { opacity: 1; transform: perspective(400px) rotateX(0) translateY(0); filter: blur(0); }
+}
+@keyframes slideUpBounce {
+    0% { opacity: 0; transform: translateY(100px); }
+    60% { transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes heartPulse {
+    0% { opacity: 0; transform: scale(0.5); }
+    80% { transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+h1{
+    font-size:30px;
+    margin-bottom:15px;
+}
+
+p{
+    max-width:400px;
+}
+
+button{
+    padding:14px 30px;
+    margin:10px;
+    border-radius:30px;
+    border:1px solid rgba(255,255,255,0.5);
+    background:rgba(255,255,255,0.2);
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    backdrop-filter: blur(10px);
+    transition:0.3s;
+}
+
+button:hover{
+    background:rgba(255,255,255,0.35);
+}
+
+.nav{
+    margin-top:30px;
+}
+
+.memory-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin-top:20px;
+    max-width:500px;
+}
+
+.memory-grid img{
+    width:100%;
+    height:100px;
+    object-fit:cover;
+    border-radius:15px;
+    transform:rotate(calc(-5deg + 10deg * var(--r)));
+    box-shadow:0 10px 20px rgba(0,0,0,0.3);
+}
+
+.overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    visibility:hidden;
+    opacity:0;
+    transition:0.3s;
+    z-index: 100;
+}
+
+.overlay.active{
+    visibility:visible;
+    opacity:1;
+}
+
+.modal{
+    background:rgba(255,255,255,0.25);
+    padding:30px;
+    border-radius:20px;
+    backdrop-filter:blur(15px);
+    text-align:center;
+    width:80%;
+    max-width:320px;
+}
+
+.paper-text{
+    position:absolute;
+    bottom:50px;
+    color:#d81b60;
+    font-weight:bold;
+    font-size:18px;
+}
+
+.music-card {
+    width: 320px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 0 auto 10px auto; /* margin bottom dikurangi */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.music-thumbnail {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.music-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.play-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    color: white;
+    font-size: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.music-thumbnail:hover .play-overlay {
+    opacity: 1;
+}
+
+.music-info {
+    margin-top: 15px;
+    text-align: left;
+}
+
+.music-info h3 {
+    margin: 0;
+}
+
+.music-info p {
+    margin: 5px 0 10px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.music-player {
+    margin-top: 10px;
+}
+
+.custom-audio {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.play-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: pink;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.play-btn:hover {
+    transform: scale(1.1);
+}
+
+.progress-container {
+    flex-grow: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: pink;
+    border-radius: 2px;
+    width: 0;
+    transition: 0.1s linear;
+}
+
+.time-display {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Teks lagu dibuat lebih rapat ke music card */
+.slide#slide3 p {
+    margin-top: 5px; /* dikurangi dari sebelumnya */
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.slide#slide3 h1 {
+    margin-bottom: 10px; /* dikurangi */
+}
+
+/* ==== TAMBAHAN POSISI BIAR 4 GAMBAR GA NUMPUK ==== */
+.side-right img{
+    width:140px;
+    position:absolute;
+    right:-70px;
+    z-index: 5;
+}
+
+.side-right img:nth-child(1){ bottom:1px; }
+.side-right img:nth-child(2){ bottom:600px; }
+.side-right img:nth-child(3){ bottom:325px; }
+.side-right img:nth-child(4){ top:10px; left:10px; width:100px; }
+/* =============================================== */
+
+/* PARTIKEL MERAH MUDAH - DIKURANGI FREKUENSINYA */
+.particle-pink {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #ffb6c1;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 50;
+    animation: floatUp 6s linear forwards;
+    box-shadow: 0 0 8px #ff69b4;
+}
+
+@keyframes floatUp {
+    0% {
+        bottom: -10px;
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    100% {
+        bottom: 110vh;
+        opacity: 0;
+        transform: scale(0.3) rotate(180deg);
+    }
+}
+
+/* Animasi biru (wave) sudah ada di atas */
+</style>
+</head>
+
+<!-- SIDE DECOR -->
+<div class="side-left"></div>
+
+<div class="side-right">
+    <img src="https://files.catbox.moe/axv20j.jpg">
+    <img src="https://files.catbox.moe/hwlwp5.jpg">
+    <img src="https://litter.catbox.moe/x0mc3cs2fvi2f748.jpg">
+    <img src="https://files.catbox.moe/h49f4h.jpg" alt="Decoration Top Right">
+</div>
+
+<body>
+
+<!-- SLIDE 1 -->
+<div class="slide active" id="slide1">
+    <h1>𝐓𝐡𝐞 𝐚𝐫𝐭 𝐀𝐋 𝐜𝐨𝐨𝐤𝐬 𝐘𝐗</h1>
+    
+    <img src="https://files.catbox.moe/46m243.jpg" alt="Thanks Image" style="width: 200px; margin: 20px auto; display: block;">
+    
+    <p>Click the next button.</p>
+ 
+    <div class="nav">
+        <button onclick="nextSlide()">Next</button>
+    </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" id="slide2">
+    <h1>About Us</h1>
+    <p>𝘫𝘶𝘴𝘵 𝘴𝘮𝘢𝘭𝘭 𝘧𝘳𝘪𝘦𝘯𝘥𝘴𝘩𝘪𝘱, 𝘯𝘰𝘵 𝘢 𝘷𝘢𝘭𝘦𝘯𝘵𝘪𝘯𝘦 𝘨𝘪𝘧𝘵𝘴, 𝘌𝘏𝘏 𝘪 𝘮𝘦𝘢𝘯 𝘧𝘳𝘪𝘦𝘯𝘥 𝘨𝘪𝘧𝘵𝘴 𝘮𝘺𝘣𝘦𝘦 :𝘷</p>
+    <div class="nav">
+        <button onclick="prevSlide()">Previous</button>
+        <button onclick="nextSlide()">Next</button>
+    </div>
+</div>
+
+<!-- SLIDE 3 - jarak teks sudah diperbaiki -->
+<div class="slide" id="slide3">
+    <h1>🎵 A Song Just For U (Yx)</h1>
+
+    <div class="music-card">
+        <div class="music-thumbnail">
+            <img src="https://files.catbox.moe/r5ufrl.jpg" alt="Song Cover">
+            <div class="play-overlay" onclick="toggleMusic()">▶</div>
+        </div>
+
+        <div class="music-info">
+            <h3>You</h3>
+            <p>- Lloyd.
+            start the song!!</p>
+        </div>
+
+        <div class="music-player">
+            <audio id="myAudio"></audio>
+            <div class="custom-audio">
+                <button class="play-btn" id="playButton">
+                    <i class='bx bx-play' id="play-icon"></i>
+                </button>
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+        </div>
+    </div>
+
+    <p style="font-style: italic; margin-top: 8px; margin-bottom: 5px;">"This song reminds me of the first time i sent the lyric video of this song and an akward moment happened😭"</p>
+
+    <div class="nav" style="margin-top: 10px;">
+        <button onclick="prevSlide()">Previous</button>
+        <button onclick="nextSlide()">Next</button>
+    </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide" id="slide4">
+    <h1>Our Memories 🎬</h1>
+    <div class="memory-grid">
+        <img src="https://files.catbox.moe/hdfi78.jpg" style="--r:1">
+        <img src="https://files.catbox.moe/hoc6q7.jpg" style="--r:2">
+        <img src="https://files.catbox.moe/jwh0r1.jpg" style="--r:3">
+        <img src="https://files.catbox.moe/ua391r.jpg" style="--r:1">
+        <img src="https://files.catbox.moe/lpsnxt.jpg" style="--r:2">
+        <img src="https://files.catbox.moe/alvred.jpg" style="--r:3">
+        <img src="https://files.catbox.moe/3hsnwv.jpg" style="--r:1">
+        <img src="https://files.catbox.moe/rvcp6p.jpg" style="--r:2">
+        <img src="https://files.catbox.moe/t7gxtz.jpg" style="--r:2">
+    </div>
+
+    <p style="font-style: italic; margin-top: 20px;">"~ a little piece of memories"</p>
+
+    <div class="nav">
+        <button onclick="prevSlide()">Previous</button>
+        <button onclick="nextSlide()">Next</button>
+    </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide" id="slide5">
+    <h1>Small Hope</h1>
+    <p>𝘪 𝘫𝘶𝘴𝘵 𝘩𝘰𝘱𝘦 𝘸𝘦 𝘤𝘢𝘯 𝘣𝘦 𝘧𝘳𝘪𝘦𝘯𝘥𝘴 𝘧𝘰𝘳𝘦𝘷𝘦𝘳𝘳𝘳 𝘦𝘷𝘦𝘯 𝘵𝘩𝘰𝘶𝘨𝘩 𝘺𝘰𝘶 𝘩𝘢𝘷𝘦 𝘴𝘰𝘮𝘦𝘰𝘯𝘦 𝘴𝘱𝘦𝘤𝘪𝘢𝘭 𝘮𝘢𝘺𝘣𝘦, 𝘪 𝘩𝘰𝘱𝘦 𝘺𝘰𝘶 𝘴𝘵𝘪𝘭𝘭 𝘳𝘦𝘮𝘦𝘮𝘣𝘦𝘳 𝘮𝘦 𝘢𝘯𝘥 𝘷𝘪𝘤𝘦 𝘷𝘦𝘳𝘴𝘢 𝘐 𝘸𝘪𝘭𝘭 𝘢𝘭𝘸𝘺𝘴 𝘳𝘦𝘮𝘦𝘮𝘣𝘦𝘳 𝘺𝘰𝘶, 𝘵𝘩𝘢𝘵'𝘴 𝘢𝘭𝘭 :).</p>
+    
+    <img src="https://files.catbox.moe/hcfaz5.jpg" alt="L" style="width: 200px; margin: 20px auto; display: block;">
+    
+    <div class="nav">
+        <button onclick="prevSlide()">Previous</button>
+        <button onclick="nextSlide()">Next</button>
+    </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide" id="slide6">
+    <h1>Thank You</h1>
+    <p>ima lwky dgaf person, so if i make something gift for u, u re special. OKK BYE, IMA GET OUT NOW!! :)</p>
+
+    <img src="https://litter.catbox.moe/5rx6hkgc7bgastzr.jpg" alt="lvyx" style="width: 200px; margin: 20px auto; display: block;">
+
+    <div class="paper-text">
+        ©   𝘵𝘩𝘪𝘴 𝘴𝘪𝘵𝘦 𝘮𝘢𝘬𝘦 𝘸𝘪𝘵𝘩 𝘩𝘦𝘢𝘳𝘵
+          ~ al
+    </div>
+    <div class="torn-paper"></div>
+
+    <div class="nav">
+        <button onclick="prevSlide()">Previous</button>
+    </div>
+</div>
+
+<!-- OMBAK (ANIMASI BIRU) - TETAP ADA -->
+<div class="wave">
+<svg viewBox="0 0 1440 320">
+<path fill="#b3e5fc" fill-opacity="1"
+d="M0,192L48,202.7C96,213,192,235,288,234.7C384,235,480,213,576,197.3C672,181,768,171,864,186.7C960,203,1056,245,1152,250.7C1248,256,1344,224,1392,208L1440,192L1440,320L0,320Z">
+</path>
+</svg>
+</div>
+
+<!-- POPUP -->
+<div class="overlay" id="popup">
+    <div class="modal">
+        <h3 id="popupText">Are u sure u want to continue?</h3>
+        <p style="font-size:13px; opacity:0.8;">🌹</p>
+        <div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+            <button onclick="confirmNext()" id="btnYes">yessir</button>
+            <button onclick="notYet()">no sir</button>
+        </div>
+    </div>
+</div>
+
+<!-- POPUP LOVE -->
+<div class="overlay" id="lovePopup">
+    <div class="modal" style="text-align: center;">
+        <div style="font-size: 80px; margin-bottom: 20px;">💌</div>
+        <h3>💝</h3>
+        <div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+            <button onclick="openLove()">Open It?</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentSlide = 1;
+let confirmCount = 0;
+let particleInterval;
+
+function showSlide(n){
+    document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+    document.getElementById('slide'+n).classList.add('active');
+}
+
+function nextSlide(){
+    if(currentSlide === 1){
+        document.getElementById('popup').classList.add('active');
+    }else if(currentSlide === 3){
+        document.getElementById('lovePopup').classList.add('active');
+    }else{
+        if(currentSlide<6){
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+    }
+}
+
+function prevSlide(){
+    if(currentSlide>1){
+        currentSlide--;
+        showSlide(currentSlide);
+    }
+}
+
+function confirmNext(){
+    confirmCount++;
+    const text = document.getElementById('popupText');
+    const btnYes = document.getElementById('btnYes');
+
+    if(confirmCount === 1){
+        text.innerText = "are u suree ?";
+        btnYes.innerText = "suree";
+    }else if(confirmCount === 2){
+        text.innerText = "already suree?😭";
+        btnYes.innerText = "sureerere";
+    }else if(confirmCount === 3){
+        text.innerText = "are you ready?";
+        btnYes.innerText = "okay go!";
+    }else{
+        document.getElementById('popup').classList.remove('active');
+        currentSlide++;
+        showSlide(currentSlide);
+        confirmCount = 0;
+        text.innerText = "already suree?😭";
+        btnYes.innerText = "okay go!";
+    }
+}
+
+function notYet(){
+    confirmCount++;
+    const text = document.getElementById('popupText');
+
+    if(confirmCount === 1){
+        text.innerText = "just click sure";
+    }else if(confirmCount === 2){
+        text.innerText = "just click sureee";
+    }else if(confirmCount === 3){
+        text.innerText = "sureee laa";
+    }else{
+        confirmCount = 0;
+        text.innerText = "just click sureee😭🙏";
+    }
+}
+
+function openLove(){
+    document.getElementById('lovePopup').classList.remove('active');
+    currentSlide++;
+    showSlide(currentSlide);
+    
+    // Partikel pink dikurangi - hanya 15 partikel sekali (lebih sedikit)
+    for (let i = 0; i < 15; i++) {
+        setTimeout(createPinkParticle, i * 100);
+    }
+}
+
+function createPinkParticle() {
+    const particle = document.createElement('div');
+    particle.className = 'particle-pink';
+    particle.style.left = Math.random() * 100 + 'vw';
+    particle.style.animationDelay = Math.random() * 2 + 's';
+    particle.style.background = `hsl(${Math.random() * 20 + 340}, 80%, 75%)`;
+    particle.style.width = Math.random() * 8 + 4 + 'px';
+    particle.style.height = particle.style.width;
+    document.body.appendChild(particle);
+    setTimeout(() => {
+        particle.remove();
+    }, 6000);
+}
+
+// Interval partikel lebih jarang (setiap 1 detik) dan jumlah sedikit
+window.onload = function() {
+    // Hanya aktifkan interval dengan frekuensi rendah
+    if (particleInterval) clearInterval(particleInterval);
+    particleInterval = setInterval(() => {
+        // Hanya buat 3 partikel setiap kali (lebih sedikit)
+        for (let i = 0; i < 3; i++) {
+            createPinkParticle();
+        }
+    }, 1000); // interval lebih lama (1 detik)
+};
+
+// Bersihkan interval saat pindah halaman (optional)
+window.addEventListener('beforeunload', function() {
+    if (particleInterval) clearInterval(particleInterval);
+});
+</script>
+
+<!-- Animasi biru tetap dan tidak dihilangkan -->
+<style>
+/* Wave/biru sudah didefinisikan di awal */
+</style>
+
+</body>
+</html>
